@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+ul.a {list-style-type: none;}
+</style>
+<body>
+<center>
+<h1>{{ question.question_text }}</h1>
+
+<ul class="a">
+{% for choice in question.choice_set.all %}
+    <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li> <br>
+{% endfor %}
+</ul>
+
+<a href="{% url 'polls:detail' question.id %}">Will U agree to vote again?</a>
+</center>
+</body>
+</html>
