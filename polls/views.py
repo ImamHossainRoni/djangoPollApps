@@ -4,11 +4,15 @@ from django.shortcuts import get_object_or_404
 from django.template import loader
 from .models import Question,Choice
 from django.views import View
-
 from django.urls import reverse
 from django.views import generic
-
 from .models import Choice, Question
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import QuestionSerializer,ChoiceSerializers
+
+
 
 
 class IndexView(generic.ListView):
@@ -60,3 +64,24 @@ def vote(request, question_id):
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
         return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+
+    """Works with REST"""
+
+class QuestionList(APIView):
+    def get_object(self, pk):
+        try:
+            return Question.objects.get(pk=pk)
+        except Question.DoesNotExist:
+            raise Http404
+
+    def post(self, request):
+        serializer = QuestionSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request):
+        myquestion = Question.objects.all()
+        serializedData = QuestionSerializer(myquestion, many=True)
+        return Response(serializedData.data)
